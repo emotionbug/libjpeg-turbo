@@ -1166,6 +1166,15 @@ public class TJDecompressor implements Closeable {
                                int width, int pitch, int height,
                                int pixelFormat) throws TJException;
 
+  /**
+   * Extract the ICC Profile from the buffer.
+   */
+  public byte[] getICCProfileData() {
+    return getICCProfile(jpegBuf, jpegBufSize);
+  }
+
+  private native byte[] getICCProfile(byte[] srcBuf, int size);
+
   static {
     TJLoader.load();
   }
