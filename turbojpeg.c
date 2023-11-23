@@ -2864,3 +2864,25 @@ DLLEXPORT int tjSaveImage(const char *filename, unsigned char *buffer,
   tj3Destroy(handle);
   return retval;
 }
+
+/* TurboJPEG 3+ */
+DLLEXPORT int tj3getICCProfile(tjhandle handle,
+                               const unsigned char *jpegBuf,
+                               unsigned long jpegSize,
+                               unsigned char **icc_data_ptr,
+                               unsigned int *icc_data_len)
+{
+  static const char FUNCTION_NAME[] = "tj3getICCProfile";
+
+  GET_DINSTANCE(handle);
+
+  jpeg_mem_src_tj(dinfo, jpegBuf, jpegSize);
+  jcopy_markers_setup(dinfo, JCOPYOPT_ALL);
+  if (jpeg_read_header(dinfo, FALSE) == JPEG_HEADER_TABLES_ONLY)
+    return 0;
+
+  const int output = jpeg_read_icc_profile(dinfo, icc_data_ptr, icc_data_len);
+  jpeg_abort_decompress(dinfo);
+
+  return output;
+}

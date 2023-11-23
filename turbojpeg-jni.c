@@ -1398,3 +1398,32 @@ bailout:
   if (filename) (*env)->ReleaseStringUTFChars(env, jfilename, filename);
   free(srcBuf);
 }
+
+/* Custom function: getICCProfile(byte[] jpegBuffer, int size) */
+JNIEXPORT jbyteArray JNICALL Java_org_libjpegturbo_turbojpeg_TJDecompressor_getICCProfile
+  (JNIEnv *env, jobject obj, jbyteArray src, jint jpegSize)
+{
+  tjhandle handle = 0;
+  unsigned char *jpegBuf = NULL;
+  void *jdstBuf = NULL, *jdstPtr;
+  unsigned char *icc_profile;
+  unsigned int icc_len;
+  int haveIccProfile;
+
+  GET_HANDLE();
+
+  BAILIF0NOEC(jpegBuf = (*env)->GetPrimitiveArrayCritical(env, src, 0));
+
+  haveIccProfile = tj3getICCProfile(handle, jpegBuf, jpegSize, &icc_profile, &icc_len);
+  if (haveIccProfile != 1)
+  {
+    return 0;
+  }
+  jdstBuf = (*env)->NewByteArray(env, icc_len);
+  BAILIF0NOEC(jdstPtr = (*env)->GetPrimitiveArrayCritical(env, jdstBuf, 0));
+  memcpy(jdstPtr, icc_profile, icc_len);
+  (*env)->ReleasePrimitiveArrayCritical(env, jdstBuf, jdstPtr, 0);
+  bailout:
+    free(icc_profile);
+  return jdstBuf;
+}

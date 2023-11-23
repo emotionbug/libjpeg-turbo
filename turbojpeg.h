@@ -2275,6 +2275,13 @@ DLLEXPORT int tjSaveImage(const char *filename, unsigned char *buffer,
 
 #define TJFLAG_LIMITSCANS  32768
 
+/* Custom Functions */
+DLLEXPORT int tj3getICCProfile(tjhandle handle,
+                               const unsigned char *jpegBuf,
+                               unsigned long jpegSize,
+                               unsigned char **icc_data_ptr,
+                               unsigned int *icc_data_len);
+
 /**
  * @}
  */

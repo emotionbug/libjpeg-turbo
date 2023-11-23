@@ -139,4 +139,5 @@ TURBOJPEG_3
     Java_org_libjpegturbo_turbojpeg_TJDecompressor_saveImage;
     Java_org_libjpegturbo_turbojpeg_TJDecompressor_set;
     Java_org_libjpegturbo_turbojpeg_TJDecompressor_setCroppingRegion;
+    Java_org_libjpegturbo_turbojpeg_TJDecompressor_getICCProfile;
 } TURBOJPEG_2.0;

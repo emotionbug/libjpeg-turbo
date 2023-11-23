@@ -119,6 +119,14 @@ JNIEXPORT void JNICALL Java_org_libjpegturbo_turbojpeg_TJDecompressor_decodeYUV8
 JNIEXPORT void JNICALL Java_org_libjpegturbo_turbojpeg_TJDecompressor_saveImage
   (JNIEnv *, jobject, jint, jstring, jobject, jint, jint, jint, jint);
 
+/*
+ * Class:     org_libjpegturbo_turbojpeg_TJDecompressor
+ * Method:    getICCProfile
+ * Signature: ([BI)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_org_libjpegturbo_turbojpeg_TJDecompressor_getICCProfile
+  (JNIEnv *env, jobject obj, jbyteArray src, jint jpegSize);
+
 #ifdef __cplusplus
 }
 #endif
