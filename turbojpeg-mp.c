@@ -70,7 +70,8 @@
 /* TurboJPEG 3+ */
 DLLEXPORT int GET_NAME(tj3Compress, BITS_IN_JSAMPLE)
   (tjhandle handle, const _JSAMPLE *srcBuf, int width, int pitch, int height,
-   int pixelFormat, unsigned char **jpegBuf, size_t *jpegSize)
+   int pixelFormat, unsigned char **jpegBuf, size_t *jpegSize,
+   unsigned char* icc_profile_bytes, size_t icc_profile_len)
 {
   static const char FUNCTION_NAME[] = GET_STRING(tj3Compress, BITS_IN_JSAMPLE);
   int i, retval = 0;
@@ -113,6 +114,12 @@ DLLEXPORT int GET_NAME(tj3Compress, BITS_IN_JSAMPLE)
   jpeg_mem_dest_tj(cinfo, jpegBuf, jpegSize, alloc);
 
   jpeg_start_compress(cinfo, TRUE);
+
+  if (icc_profile_len > 0 && icc_profile_bytes != NULL)
+  {
+    jpeg_write_icc_profile(cinfo, icc_profile_bytes, icc_profile_len);
+  }
+
   for (i = 0; i < height; i++) {
     if (this->bottomUp)
       row_pointer[i] = (_JSAMPROW)&srcBuf[(height - i - 1) * (size_t)pitch];

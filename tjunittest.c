@@ -447,13 +447,13 @@ static void compTest(tjhandle handle, unsigned char **dstBuf, size_t *dstSize,
              jpegQual);
     if (precision == 8) {
       TRY_TJ(handle, tj3Compress8(handle, (unsigned char *)srcBuf, w, 0, h, pf,
-                                  dstBuf, dstSize));
+                                  dstBuf, dstSize, NULL, 0));
     } else if (precision == 12) {
       TRY_TJ(handle, tj3Compress12(handle, (short *)srcBuf, w, 0, h, pf,
-                                   dstBuf, dstSize));
+                                   dstBuf, dstSize, NULL, 0));
     } else {
       TRY_TJ(handle, tj3Compress16(handle, (unsigned short *)srcBuf, w, 0, h,
-                                   pf, dstBuf, dstSize));
+                                   pf, dstBuf, dstSize, NULL, 0));
     }
   }
 
@@ -766,13 +766,13 @@ static void bufSizeTest(void)
         } else {
           if (precision == 8) {
             TRY_TJ(handle, tj3Compress8(handle, (unsigned char *)srcBuf, w, 0,
-                                        h, TJPF_BGRX, &dstBuf, &dstSize));
+                                        h, TJPF_BGRX, &dstBuf, &dstSize, NULL, 0));
           } else if (precision == 12) {
             TRY_TJ(handle, tj3Compress12(handle, (short *)srcBuf, w, 0, h,
-                                         TJPF_BGRX, &dstBuf, &dstSize));
+                                         TJPF_BGRX, &dstBuf, &dstSize, NULL, 0));
           } else {
             TRY_TJ(handle, tj3Compress16(handle, (unsigned short *)srcBuf, w,
-                                         0, h, TJPF_BGRX, &dstBuf, &dstSize));
+                                         0, h, TJPF_BGRX, &dstBuf, &dstSize, NULL, 0));
           }
         }
         free(srcBuf);  srcBuf = NULL;
@@ -800,13 +800,13 @@ static void bufSizeTest(void)
         } else {
           if (precision == 8) {
             TRY_TJ(handle, tj3Compress8(handle, (unsigned char *)srcBuf, h, 0,
-                                        w, TJPF_BGRX, &dstBuf, &dstSize));
+                                        w, TJPF_BGRX, &dstBuf, &dstSize, NULL, 0));
           } else if (precision == 12) {
             TRY_TJ(handle, tj3Compress12(handle, (short *)srcBuf, h, 0, w,
-                                         TJPF_BGRX, &dstBuf, &dstSize));
+                                         TJPF_BGRX, &dstBuf, &dstSize, NULL, 0));
           } else {
             TRY_TJ(handle, tj3Compress16(handle, (unsigned short *)srcBuf, h,
-                                         0, w, TJPF_BGRX, &dstBuf, &dstSize));
+                                         0, w, TJPF_BGRX, &dstBuf, &dstSize, NULL, 0));
           }
         }
         free(srcBuf);  srcBuf = NULL;

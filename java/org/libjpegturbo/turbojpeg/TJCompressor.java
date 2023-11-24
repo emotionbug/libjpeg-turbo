@@ -388,30 +388,6 @@ public class TJCompressor implements Closeable {
   public native int get(int param);
 
   /**
-   * @deprecated Use
-   * <code>{@link #set set}({@link TJ#PARAM_SUBSAMP}, ...)</code> instead.
-   */
-  @SuppressWarnings("checkstyle:JavadocMethod")
-  @Deprecated
-  public void setSubsamp(int subsamp) {
-    if (subsamp < 0 || subsamp >= TJ.NUMSAMP)
-      throw new IllegalArgumentException("Invalid argument in setSubsamp()");
-    set(TJ.PARAM_SUBSAMP, subsamp);
-  }
-
-  /**
-   * @deprecated Use
-   * <code>{@link #set set}({@link TJ#PARAM_QUALITY}, ...)</code> instead.
-   */
-  @SuppressWarnings("checkstyle:JavadocMethod")
-  @Deprecated
-  public void setJPEGQuality(int quality) {
-    if (quality < 1 || quality > 100)
-      throw new IllegalArgumentException("Invalid argument in setJPEGQuality()");
-    set(TJ.PARAM_QUALITY, quality);
-  }
-
-  /**
    * Compress the packed-pixel or planar YUV source image associated with this
    * compressor instance and output a JPEG image to the given destination
    * buffer.
@@ -421,7 +397,7 @@ public class TJCompressor implements Closeable {
    * buffer based on the source image's width and height and the desired level
    * of chrominance subsampling (see {@link TJ#PARAM_SUBSAMP}.)
    */
-  public void compress(byte[] dstBuf) throws TJException {
+  public void compress(byte[] dstBuf, byte[] iccProfile) throws TJException {
     if (dstBuf == null)
       throw new IllegalArgumentException("Invalid argument in compress()");
 
@@ -436,30 +412,18 @@ public class TJCompressor implements Closeable {
                                         srcYUVImage.getHeight(), dstBuf);
     } else if (srcBuf8 != null)
       compressedSize = compress8(srcBuf8, srcX, srcY, srcWidth, srcPitch,
-                                 srcHeight, srcPixelFormat, dstBuf);
+                                 srcHeight, srcPixelFormat, dstBuf, iccProfile);
     else if (srcBuf12 != null)
       compressedSize = compress12(srcBuf12, srcX, srcY, srcWidth, srcPitch,
-                                  srcHeight, srcPixelFormat, dstBuf);
+                                  srcHeight, srcPixelFormat, dstBuf, iccProfile);
     else if (srcBuf16 != null)
       compressedSize = compress16(srcBuf16, srcX, srcY, srcWidth, srcPitch,
-                                  srcHeight, srcPixelFormat, dstBuf);
+                                  srcHeight, srcPixelFormat, dstBuf, iccProfile);
     else if (srcBufInt != null)
       compressedSize = compress8(srcBufInt, srcX, srcY, srcWidth, srcStride,
-                                 srcHeight, srcPixelFormat, dstBuf);
+                                 srcHeight, srcPixelFormat, dstBuf, iccProfile);
     else
       throw new IllegalStateException("No source image is associated with this instance");
-  }
-
-  /**
-   * @deprecated Use {@link #set set()} and {@link #compress(byte[])} instead.
-   */
-  @SuppressWarnings("checkstyle:JavadocMethod")
-  @Deprecated
-  public void compress(byte[] dstBuf, int flags) throws TJException {
-    if (flags < 0)
-      throw new IllegalArgumentException("Invalid argument in compress()");
-    processFlags(flags);
-    compress(dstBuf);
   }
 
   /**
@@ -470,7 +434,7 @@ public class TJCompressor implements Closeable {
    * not be equal to the size of the JPEG image.  Use
    * {@link #getCompressedSize} to obtain the size of the JPEG image.
    */
-  public byte[] compress() throws TJException {
+  public byte[] compress(byte[] iccProfile) throws TJException {
     byte[] buf;
     if (srcYUVImage != null) {
       buf = new byte[TJ.bufSize(srcYUVImage.getWidth(),
@@ -481,18 +445,8 @@ public class TJCompressor implements Closeable {
       int subsamp = get(TJ.PARAM_SUBSAMP);
       buf = new byte[TJ.bufSize(srcWidth, srcHeight, subsamp)];
     }
-    compress(buf);
+    compress(buf, iccProfile);
     return buf;
-  }
-
-  /**
-   * @deprecated Use {@link #set set()} and {@link #compress()} instead.
-   */
-  @SuppressWarnings("checkstyle:JavadocMethod")
-  @Deprecated
-  public byte[] compress(int flags) throws TJException {
-    processFlags(flags);
-    return compress();
   }
 
   /**
@@ -532,20 +486,6 @@ public class TJCompressor implements Closeable {
   }
 
   /**
-   * @deprecated Use {@link #set set()} and {@link #encodeYUV(YUVImage)}
-   * instead.
-   */
-  @SuppressWarnings("checkstyle:JavadocMethod")
-  @Deprecated
-  public void encodeYUV(YUVImage dstImage, int flags) throws TJException {
-    if (flags < 0)
-      throw new IllegalArgumentException("Invalid argument in encodeYUV()");
-
-    processFlags(flags);
-    encodeYUV(dstImage);
-  }
-
-  /**
    * Encode the 8-bit-per-sample packed-pixel source image associated with this
    * compressor instance into an 8-bit-per-sample unified planar YUV image and
    * return a {@link YUVImage} instance containing the encoded image.  This
@@ -571,16 +511,6 @@ public class TJCompressor implements Closeable {
                                         get(TJ.PARAM_SUBSAMP));
     encodeYUV(dstYUVImage);
     return dstYUVImage;
-  }
-
-  /**
-   * @deprecated Use {@link #set set()} and {@link #encodeYUV(int)} instead.
-   */
-  @SuppressWarnings("checkstyle:JavadocMethod")
-  @Deprecated
-  public YUVImage encodeYUV(int align, int flags) throws TJException {
-    processFlags(flags);
-    return encodeYUV(align);
   }
 
   /**
@@ -613,16 +543,6 @@ public class TJCompressor implements Closeable {
   }
 
   /**
-   * @deprecated Use {@link #set set()} and {@link #encodeYUV(int[])} instead.
-   */
-  @SuppressWarnings("checkstyle:JavadocMethod")
-  @Deprecated
-  public YUVImage encodeYUV(int[] strides, int flags) throws TJException {
-    processFlags(flags);
-    return encodeYUV(strides);
-  }
-
-  /**
    * Returns the size of the image (in bytes) generated by the most recent
    * compress operation.
    *
@@ -642,30 +562,6 @@ public class TJCompressor implements Closeable {
       destroy();
   }
 
-  @SuppressWarnings("checkstyle:DesignForExtension")
-  @Override
-  protected void finalize() throws Throwable {
-    try {
-      close();
-    } catch (TJException e) {
-    } finally {
-      super.finalize();
-    }
-  };
-
-  @SuppressWarnings("deprecation")
-  private void processFlags(int flags) {
-    set(TJ.PARAM_BOTTOMUP, (flags & TJ.FLAG_BOTTOMUP) != 0 ? 1 : 0);
-
-    if (get(TJ.PARAM_QUALITY) >= 96 || (flags & TJ.FLAG_ACCURATEDCT) != 0)
-      set(TJ.PARAM_FASTDCT, 0);
-    else
-      set(TJ.PARAM_FASTDCT, 1);
-
-    set(TJ.PARAM_STOPONWARNING, (flags & TJ.FLAG_STOPONWARNING) != 0 ? 1 : 0);
-    set(TJ.PARAM_PROGRESSIVE, (flags & TJ.FLAG_PROGRESSIVE) != 0 ? 1 : 0);
-  }
-
   private void checkSubsampling() {
     if (get(TJ.PARAM_SUBSAMP) == TJ.SAMP_UNKNOWN)
       throw new IllegalStateException("TJ.PARAM_SUBSAMP must be specified");
@@ -678,19 +574,19 @@ public class TJCompressor implements Closeable {
   // JPEG size in bytes is returned
   @SuppressWarnings("checkstyle:HiddenField")
   private native int compress8(byte[] srcBuf, int x, int y, int width,
-    int pitch, int height, int pixelFormat, byte[] jpegBuf) throws TJException;
+    int pitch, int height, int pixelFormat, byte[] jpegBuf, byte[] iccProfile) throws TJException;
 
   @SuppressWarnings("checkstyle:HiddenField")
   private native int compress12(short[] srcBuf, int x, int y, int width,
-    int pitch, int height, int pixelFormat, byte[] jpegBuf) throws TJException;
+    int pitch, int height, int pixelFormat, byte[] jpegBuf, byte[] iccProfile) throws TJException;
 
   @SuppressWarnings("checkstyle:HiddenField")
   private native int compress16(short[] srcBuf, int x, int y, int width,
-    int pitch, int height, int pixelFormat, byte[] jpegBuf) throws TJException;
+    int pitch, int height, int pixelFormat, byte[] jpegBuf, byte[] iccProfile) throws TJException;
 
   @SuppressWarnings("checkstyle:HiddenField")
   private native int compress8(int[] srcBuf, int x, int y, int width,
-    int stride, int height, int pixelFormat, byte[] jpegBuf)
+    int stride, int height, int pixelFormat, byte[] jpegBuf, byte[] iccProfile)
     throws TJException;
 
   @SuppressWarnings("checkstyle:HiddenField")

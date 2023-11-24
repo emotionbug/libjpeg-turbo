@@ -118,8 +118,8 @@ TURBOJPEG_3
     tj3YUVPlaneHeight;
     tj3YUVPlaneSize;
     tj3YUVPlaneWidth;
-    Java_org_libjpegturbo_turbojpeg_TJCompressor_compress8___3BIIIIII_3B;
-    Java_org_libjpegturbo_turbojpeg_TJCompressor_compress8___3IIIIIII_3B;
+    Java_org_libjpegturbo_turbojpeg_TJCompressor_compress8___3BIIIIII_3B_3B;
+    Java_org_libjpegturbo_turbojpeg_TJCompressor_compress8___3IIIIIII_3B_3B;
     Java_org_libjpegturbo_turbojpeg_TJCompressor_compress12;
     Java_org_libjpegturbo_turbojpeg_TJCompressor_compress16;
     Java_org_libjpegturbo_turbojpeg_TJCompressor_compressFromYUV8;

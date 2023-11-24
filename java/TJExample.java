@@ -374,7 +374,7 @@ class TJExample implements TJCustomFilter {
           tjc.setSourceImage(img, 0, 0, 0, 0);
         else
           tjc.setSourceImage(imgBuf, 0, 0, width, 0, height, TJ.PF_BGRX);
-        byte[] jpegBuf = tjc.compress();
+        byte[] jpegBuf = tjc.compress(null);
         int jpegSize = tjc.getCompressedSize();
         tjc.close();
 

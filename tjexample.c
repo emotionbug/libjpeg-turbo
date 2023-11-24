@@ -389,7 +389,7 @@ int main(int argc, char **argv)
     if (tj3Set(tjInstance, TJPARAM_FASTDCT, fastDCT) < 0)
       THROW_TJ("setting TJPARAM_FASTDCT");
     if (tj3Compress8(tjInstance, imgBuf, width, 0, height, pixelFormat,
-                     &jpegBuf, &jpegSize) < 0)
+                     &jpegBuf, &jpegSize, NULL, 0) < 0)
       THROW_TJ("compressing image");
     tj3Destroy(tjInstance);  tjInstance = NULL;
 

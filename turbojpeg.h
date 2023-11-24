@@ -1127,7 +1127,8 @@ DLLEXPORT int tj3Get(tjhandle handle, int param);
  */
 DLLEXPORT int tj3Compress8(tjhandle handle, const unsigned char *srcBuf,
                            int width, int pitch, int height, int pixelFormat,
-                           unsigned char **jpegBuf, size_t *jpegSize);
+                           unsigned char **jpegBuf, size_t *jpegSize,
+                           unsigned char* icc_profile_bytes, size_t icc_profile_len);
 
 /**
  * Compress a 12-bit-per-sample packed-pixel RGB, grayscale, or CMYK image into
@@ -1137,7 +1138,8 @@ DLLEXPORT int tj3Compress8(tjhandle handle, const unsigned char *srcBuf,
  */
 DLLEXPORT int tj3Compress12(tjhandle handle, const short *srcBuf, int width,
                             int pitch, int height, int pixelFormat,
-                            unsigned char **jpegBuf, size_t *jpegSize);
+                            unsigned char **jpegBuf, size_t *jpegSize,
+                            unsigned char* icc_profile_bytes, size_t icc_profile_len);
 
 /**
  * Compress a 16-bit-per-sample packed-pixel RGB, grayscale, or CMYK image into
@@ -1147,7 +1149,8 @@ DLLEXPORT int tj3Compress12(tjhandle handle, const short *srcBuf, int width,
  */
 DLLEXPORT int tj3Compress16(tjhandle handle, const unsigned short *srcBuf,
                             int width, int pitch, int height, int pixelFormat,
-                            unsigned char **jpegBuf, size_t *jpegSize);
+                            unsigned char **jpegBuf, size_t *jpegSize,
+                            unsigned char* icc_profile_bytes, size_t icc_profile_len);
 
 
 /**

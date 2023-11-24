@@ -209,12 +209,14 @@ bailout:
 static jint TJCompressor_compress
   (JNIEnv *env, jobject obj, jarray src, jint srcElementSize, jint precision,
    jint x, jint y, jint width, jint pitch, jint height, jint pf,
-   jbyteArray dst)
+   jbyteArray dst, jbyteArray iccProfile)
 {
   tjhandle handle = 0;
   size_t jpegSize = 0;
+  size_t iccProfileSize = 0;
   jsize arraySize = 0, actualPitch;
   void *srcBuf = NULL;
+  unsigned char *iccProfileBuf = NULL;
   unsigned char *jpegBuf = NULL;
   int jpegSubsamp;
 
@@ -238,34 +240,44 @@ static jint TJCompressor_compress
   jpegSize = tj3JPEGBufSize(width, height, jpegSubsamp);
   if ((*env)->GetArrayLength(env, dst) < (jsize)jpegSize)
     THROW_ARG("Destination buffer is not large enough");
+  if (iccProfile != NULL)
+    iccProfileSize = (*env)->GetArrayLength(env, iccProfile);
 
   if (tj3Set(handle, TJPARAM_NOREALLOC, 1) == -1)
     THROW_TJ();
 
   BAILIF0NOEC(srcBuf = (*env)->GetPrimitiveArrayCritical(env, src, 0));
+  if (iccProfile != NULL)
+    BAILIF0NOEC(iccProfileBuf = (*env)->GetPrimitiveArrayCritical(env, iccProfile, 0));
   BAILIF0NOEC(jpegBuf = (*env)->GetPrimitiveArrayCritical(env, dst, 0));
 
   if (precision == 8) {
     if (tj3Compress8(handle, &((unsigned char *)srcBuf)[y * actualPitch +
                                                         x * tjPixelSize[pf]],
-                     width, pitch, height, pf, &jpegBuf, &jpegSize) == -1) {
+                     width, pitch, height, pf, &jpegBuf, &jpegSize,
+                     iccProfileBuf, iccProfileSize) == -1) {
       SAFE_RELEASE(dst, jpegBuf);
+      SAFE_RELEASE(iccProfile, iccProfileBuf);
       SAFE_RELEASE(src, srcBuf);
       THROW_TJ();
     }
   } else if (precision == 12) {
     if (tj3Compress12(handle, &((short *)srcBuf)[y * actualPitch +
                                                  x * tjPixelSize[pf]],
-                      width, pitch, height, pf, &jpegBuf, &jpegSize) == -1) {
+                      width, pitch, height, pf, &jpegBuf, &jpegSize,
+                      iccProfileBuf, iccProfileSize) == -1) {
       SAFE_RELEASE(dst, jpegBuf);
+      SAFE_RELEASE(iccProfile, iccProfileBuf);
       SAFE_RELEASE(src, srcBuf);
       THROW_TJ();
     }
   } else {
     if (tj3Compress16(handle, &((unsigned short *)srcBuf)[y * actualPitch +
                                                           x * tjPixelSize[pf]],
-                      width, pitch, height, pf, &jpegBuf, &jpegSize) == -1) {
+                      width, pitch, height, pf, &jpegBuf, &jpegSize,
+                      iccProfileBuf, iccProfileSize) == -1) {
       SAFE_RELEASE(dst, jpegBuf);
+      SAFE_RELEASE(iccProfile, iccProfileBuf);
       SAFE_RELEASE(src, srcBuf);
       THROW_TJ();
     }
@@ -273,41 +285,42 @@ static jint TJCompressor_compress
 
 bailout:
   SAFE_RELEASE(dst, jpegBuf);
+  SAFE_RELEASE(iccProfile, iccProfileBuf);
   SAFE_RELEASE(src, srcBuf);
   return (jint)jpegSize;
 }
 
 /* TurboJPEG 3: TJCompressor::compress8() byte source */
-JNIEXPORT jint JNICALL Java_org_libjpegturbo_turbojpeg_TJCompressor_compress8___3BIIIIII_3B
+JNIEXPORT jint JNICALL Java_org_libjpegturbo_turbojpeg_TJCompressor_compress8___3BIIIIII_3B_3B
   (JNIEnv *env, jobject obj, jbyteArray src, jint x, jint y, jint width,
-   jint pitch, jint height, jint pf, jbyteArray dst)
+   jint pitch, jint height, jint pf, jbyteArray dst, jbyteArray iccProfile)
 {
   return TJCompressor_compress(env, obj, src, 1, 8, x, y, width, pitch, height,
-                               pf, dst);
+                               pf, dst, iccProfile);
 }
 
 /* TurboJPEG 3: TJCompressor::compress12() */
 JNIEXPORT jint JNICALL Java_org_libjpegturbo_turbojpeg_TJCompressor_compress12
   (JNIEnv *env, jobject obj, jshortArray src, jint x, jint y, jint width,
-   jint pitch, jint height, jint pf, jbyteArray dst)
+   jint pitch, jint height, jint pf, jbyteArray dst, jbyteArray iccProfile)
 {
   return TJCompressor_compress(env, obj, src, 1, 12, x, y, width, pitch,
-                               height, pf, dst);
+                               height, pf, dst, iccProfile);
 }
 
 /* TurboJPEG 3: TJCompressor::compress16() */
 JNIEXPORT jint JNICALL Java_org_libjpegturbo_turbojpeg_TJCompressor_compress16
   (JNIEnv *env, jobject obj, jshortArray src, jint x, jint y, jint width,
-   jint pitch, jint height, jint pf, jbyteArray dst)
+   jint pitch, jint height, jint pf, jbyteArray dst, jbyteArray iccProfile)
 {
   return TJCompressor_compress(env, obj, src, 1, 16, x, y, width, pitch,
-                               height, pf, dst);
+                               height, pf, dst, iccProfile);
 }
 
 /* TurboJPEG 3: TJCompressor::compress8() int source */
-JNIEXPORT jint JNICALL Java_org_libjpegturbo_turbojpeg_TJCompressor_compress8___3IIIIIII_3B
+JNIEXPORT jint JNICALL Java_org_libjpegturbo_turbojpeg_TJCompressor_compress8___3IIIIIII_3B_3B
   (JNIEnv *env, jobject obj, jintArray src, jint x, jint y, jint width,
-   jint stride, jint height, jint pf, jbyteArray dst)
+   jint stride, jint height, jint pf, jbyteArray dst, jbyteArray iccProfile)
 {
   if (pf < 0 || pf >= org_libjpegturbo_turbojpeg_TJ_NUMPF)
     THROW_ARG("Invalid argument in compress8()");
@@ -315,7 +328,7 @@ JNIEXPORT jint JNICALL Java_org_libjpegturbo_turbojpeg_TJCompressor_compress8___
     THROW_ARG("Pixel format must be 32-bit when compressing from an integer buffer.");
 
   return TJCompressor_compress(env, obj, src, sizeof(jint), 8, x, y, width,
-                               stride * sizeof(jint), height, pf, dst);
+                               stride * sizeof(jint), height, pf, dst, iccProfile);
 
 bailout:
   return 0;
@@ -1417,13 +1430,16 @@ JNIEXPORT jbyteArray JNICALL Java_org_libjpegturbo_turbojpeg_TJDecompressor_getI
   haveIccProfile = tj3getICCProfile(handle, jpegBuf, jpegSize, &icc_profile, &icc_len);
   if (haveIccProfile != 1)
   {
-    return 0;
+    jdstBuf = NULL;
+    goto bailout;
   }
+
   jdstBuf = (*env)->NewByteArray(env, icc_len);
   BAILIF0NOEC(jdstPtr = (*env)->GetPrimitiveArrayCritical(env, jdstBuf, 0));
   memcpy(jdstPtr, icc_profile, icc_len);
   (*env)->ReleasePrimitiveArrayCritical(env, jdstBuf, jdstPtr, 0);
   bailout:
+    SAFE_RELEASE(src, jpegBuf);
     free(icc_profile);
   return jdstBuf;
 }

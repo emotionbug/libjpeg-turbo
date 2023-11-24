@@ -492,16 +492,16 @@ static int fullTest(tjhandle handle, void *srcBuf, int w, int h, int subsamp,
           } else {
             if (precision == 8) {
               if (tj3Compress8(handle, srcPtr2, width, pitch, height, pf,
-                               &jpegBufs[tile], &jpegSizes[tile]) == -1)
+                               &jpegBufs[tile], &jpegSizes[tile], NULL, 0) == -1)
                 THROW_TJ();
             } else if (precision == 12) {
               if (tj3Compress12(handle, (short *)srcPtr2, width, pitch, height,
-                                pf, &jpegBufs[tile], &jpegSizes[tile]) == -1)
+                                pf, &jpegBufs[tile], &jpegSizes[tile], NULL, 0) == -1)
                 THROW_TJ();
             } else {
               if (tj3Compress16(handle, (unsigned short *)srcPtr2, width,
                                 pitch, height, pf, &jpegBufs[tile],
-                                &jpegSizes[tile]) == -1)
+                                &jpegSizes[tile], NULL, 0) == -1)
                 THROW_TJ();
             }
           }

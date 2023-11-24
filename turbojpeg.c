@@ -1166,7 +1166,7 @@ DLLEXPORT int tjCompress2(tjhandle handle, const unsigned char *srcBuf,
 
   size = (size_t)(*jpegSize);
   retval = tj3Compress8(handle, srcBuf, width, pitch, height, pixelFormat,
-                        jpegBuf, &size);
+                        jpegBuf, &size, NULL, 0);
   *jpegSize = (unsigned long)size;
 
 bailout:
